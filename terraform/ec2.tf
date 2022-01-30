@@ -15,11 +15,12 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "bastion" {
+  count                       = length(aws_subnet.gw)
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   key_name                    = aws_key_pair.bastion.key_name
-  subnet_id                   = aws_subnet.gw[0].id
+  subnet_id                   = aws_subnet.gw[count.index].id
   vpc_security_group_ids      = [aws_security_group.bastion.id]
   user_data_base64            = base64encode(file("${path.module}/data/initialize_bastion.sh"))
 
@@ -32,6 +33,6 @@ resource "aws_instance" "bastion" {
   }
 
   tags = {
-    Name = "Bastion Host"
+    Name = "Bastion Host (${aws_subnet.gw[count.index].availability_zone})"
   }
 }
