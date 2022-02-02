@@ -18,7 +18,8 @@ if [[ ! $(which brew) == "" ]]; then
 else
 	os=$(uname -s | perl -ne 'print lc')
 	tmpdir=$(mktemp -d)
-	curl -o "$tmpdir/aws-iam-authenticator" "https://amazon-eks.s3.us-west-2.amazonaws.com/$version/2021-07-05/bin/$os/amd64/aws-iam-authenticator"
+	curl --silent -o "$tmpdir/aws-iam-authenticator" "https://amazon-eks.s3.us-west-2.amazonaws.com/$version/2021-07-05/bin/$os/amd64/aws-iam-authenticator"
+	chmod +x "$tmpdir/$pkg"
 	sudo mv "$tmpdir/$pkg" /usr/local/bin
 	rm -rf $tmpdir
 fi

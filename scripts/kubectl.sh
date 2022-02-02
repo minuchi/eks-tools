@@ -15,8 +15,8 @@ fi
 os=$(uname -s | perl -ne 'print lc')
 tmpdir=$(mktemp -d)
 echo "Installing $pkgname..."
-curl -o "$tmpdir/$pkg" "https://amazon-eks.s3.us-west-2.amazonaws.com/$version/2021-07-05/bin/$os/amd64/kubectl"
-
+curl --slient -o "$tmpdir/$pkg" "https://amazon-eks.s3.us-west-2.amazonaws.com/$version/2021-07-05/bin/$os/amd64/kubectl"
+chmod +x "$tmpdir/$pkg"
 sudo mv "$tmpdir/$pkg" /usr/local/bin
 
 rm -rf $tmpdir

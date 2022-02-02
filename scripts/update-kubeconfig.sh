@@ -1,7 +1,11 @@
 #!/bin/bash
-set -euo pipefail
-echo "Cluster name?"
-read cluster
+set -e
+
+cluster=$1
+if [[ $cluster == "" ]]; then
+    echo "Cluster name?"
+    read cluster
+fi
 
 ekscluster=$(aws eks list-clusters | jq -r ".clusters | index(\"$cluster\")")
 

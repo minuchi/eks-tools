@@ -20,7 +20,8 @@ else
 	tmpdir=$(mktemp -d)
 
 	curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C $tmpdir
-	sudo mv $tmpdir/$eksctl /usr/local/bin
+	chmod +x "$tmpdir/$pkg"
+	sudo mv $tmpdir/$pkg /usr/local/bin
 
 	rm -rf $tmpdir
 fi
