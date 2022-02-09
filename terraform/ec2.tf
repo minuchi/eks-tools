@@ -14,6 +14,7 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
+# TODO: change it to auto scailing groups and use spot instance
 resource "aws_instance" "bastion" {
   count                       = length(aws_subnet.gw)
   ami                         = data.aws_ami.ubuntu.id

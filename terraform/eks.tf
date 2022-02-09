@@ -23,10 +23,10 @@ module "eks" {
     }
   }
 
-  #   cluster_encryption_config = [{
-  #     provider_key_arn = "ac01234b-00d9-40f6-ac95-e42345f78b00"
-  #     resources        = ["secrets"]
-  #   }]
+  cluster_encryption_config = [{
+    provider_key_arn = aws_kms_key.cluster.arn
+    resources        = ["secrets"]
+  }]
 
   vpc_id     = aws_vpc.main.id
   subnet_ids = concat(aws_subnet.gw.*.id, aws_subnet.prvt.*.id)
@@ -35,7 +35,7 @@ module "eks" {
   eks_managed_node_group_defaults = {
     ami_type               = "AL2_x86_64"
     disk_size              = 32
-    instance_types         = ["m6i.large"]
+    instance_types         = ["t2.medium", "t3.medium", "t3a.medium"]
     vpc_security_group_ids = []
   }
 
@@ -61,16 +61,10 @@ module "eks" {
       max_size     = 2
       desired_size = 2
 
-      instance_types = ["m6i.large"]
-      labels = {
-        Environment = "test"
-        GithubRepo  = "terraform-aws-eks"
-        GithubOrg   = "terraform-aws-modules"
-      }
-
-      tags = {
-        ExtraTag = "example"
-      }
+      capacity_type  = "SPOT"
+      instance_types = ["t2.medium", "t3.medium", "t3a.medium"]
+      labels         = {}
+      tags           = {}
 
       subnet_ids = aws_subnet.prvt.*.id
 
@@ -78,7 +72,7 @@ module "eks" {
       TMOUT=600; export TMOUT
       EOT
 
-      bootstrap_extra_args = "--kubelet-extra-args '--max-pods=110'"
+      bootstrap_extra_args = "--kubelet-extra-args '--max-pods=110' '--node-labels=node.kubernetes.io/lifecycle=spot'"
 
       create_node_security_group = false
       node_security_group_id     = aws_security_group.nodes.id
@@ -140,4 +134,9 @@ resource "aws_security_group" "nodes" {
   tags = {
     Name = "nodes"
   }
+}
+
+resource "aws_kms_key" "cluster" {
+  description             = "Encryption for secrets"
+  deletion_window_in_days = 10
 }
